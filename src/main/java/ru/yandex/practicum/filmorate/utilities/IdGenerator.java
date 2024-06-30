@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.utilities;
 
 public class IdGenerator {
     private Long lastId = 0L;

@@ -1,13 +1,18 @@
 package ru.yandex.practicum.filmorate.service;
 
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Comparator;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.repository.Repository;
+import ru.yandex.practicum.filmorate.utilities.IdGenerator;
 
 @Slf4j
+@Service
 public class FilmService {
     private final Repository<Film, Long> repository;
     private final IdGenerator generator;
@@ -34,6 +39,23 @@ public class FilmService {
     public Collection<Film> getAll() {
         log.info("Get all films");
         return repository.getAll();
+    }
+
+    public Film getById(Long id) {
+        return repository.get(id);
+    }
+
+    public Collection<Film> getFilms(int size, int from, String sort) {
+        Comparator<LocalDate> comparator = (o1, o2) ->
+                sort.equals("asc")
+                        ? o1.compareTo(o2)
+                        : o2.compareTo(o1);
+        return repository.getAll().stream()
+                .sorted(Comparator.comparing(Film::getReleaseDate, comparator))
+                .skip(from)
+                .limit(size)
+                .toList();
+
     }
 }
 
