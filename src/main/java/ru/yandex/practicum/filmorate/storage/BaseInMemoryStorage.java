@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.repository;
+package ru.yandex.practicum.filmorate.storage;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -6,10 +6,10 @@ import java.util.Map;
 
 import ru.yandex.practicum.filmorate.exception.RepositoryNotFoundException;
 
-public class Repository<T, K> {
+public abstract class BaseInMemoryStorage<T, K> implements Storage<T, K> {
     private final Map<K, T> storage;
 
-    public Repository() {
+    public BaseInMemoryStorage() {
         this.storage = new HashMap<>();
     }
 
