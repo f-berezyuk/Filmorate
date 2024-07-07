@@ -15,7 +15,7 @@ import ru.yandex.practicum.filmorate.annotation.Login;
 @Data
 @Valid
 @AllArgsConstructor
-public class User {
+public class User implements IdModel<Long> {
     private Long id;
     @Email
     @NotBlank

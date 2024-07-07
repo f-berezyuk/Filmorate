@@ -9,25 +9,20 @@ import org.springframework.stereotype.Service;
 
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Storage;
-import ru.yandex.practicum.filmorate.utilities.IdGenerator;
 
 @Slf4j
 @Service
 public class UserService {
     private final Storage<User, Long> storage;
-    private final IdGenerator generator;
 
-    public UserService(Storage<User, Long> repository, IdGenerator generator) {
+    public UserService(Storage<User, Long> repository) {
         log.info("Init User service.");
         this.storage = repository;
-        this.generator = generator;
     }
 
     public User add(User user) {
-        Long id = generator.generate();
-        user.setId(id);
-        storage.add(user, id);
-        log.info("Add user [" + user.getName() + "] with key [" + id + "]");
+        storage.add(user);
+        log.info("Add user [" + user.getName() + "] with key [" + user.getId() + "]");
         return user;
     }
 

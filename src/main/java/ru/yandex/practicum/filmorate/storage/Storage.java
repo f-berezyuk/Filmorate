@@ -14,7 +14,9 @@ public interface Storage<T, K> {
 
     Collection<T> getAll();
 
-    T add(T value, K key) throws IllegalArgumentException;
+    T add(T value) throws IllegalArgumentException;
 
+    T add(K key, T value);
 
+    Collection<K> keySet();
 }
