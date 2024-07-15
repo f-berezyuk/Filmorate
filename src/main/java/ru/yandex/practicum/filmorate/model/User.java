@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -14,7 +15,7 @@ import ru.yandex.practicum.filmorate.annotation.Login;
 @Data
 @Valid
 @AllArgsConstructor
-public class User {
+public class User implements IdModel<Long> {
     private Long id;
     @Email
     @NotBlank
@@ -24,6 +25,7 @@ public class User {
     private String name;
     @PastOrPresent
     private LocalDate birthday;
+    private Set<Long> friends;
 
     public User(String email, String login, String name, LocalDate birthday) {
         this.email = email;
@@ -34,5 +36,13 @@ public class User {
 
     public String getName() {
         return name.isBlank() ? login : name;
+    }
+
+    public void addFriend(Long friend) {
+        friends.add(friend);
+    }
+
+    public void removeFriend(Long friend) {
+        friends.remove(friend);
     }
 }

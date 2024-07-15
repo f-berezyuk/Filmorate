@@ -16,7 +16,7 @@ import ru.yandex.practicum.filmorate.annotation.PositiveDuration;
 @Data
 @Valid
 @AllArgsConstructor
-public class Film {
+public class Film implements IdModel<Long> {
     private Long id;
     @NotBlank(message = "Name may not be null or empty")
     private String name;
