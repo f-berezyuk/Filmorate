@@ -1,15 +1,13 @@
 package ru.yandex.practicum.filmorate.validator;
 
-import java.time.Duration;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 import ru.yandex.practicum.filmorate.annotation.PositiveDuration;
 
-public class DurationPositiveValidator implements ConstraintValidator<PositiveDuration, Duration> {
+public class DurationPositiveValidator implements ConstraintValidator<PositiveDuration, Integer> {
     @Override
-    public boolean isValid(Duration value, ConstraintValidatorContext context) {
-        return value == null || value.toMinutes() > 0;
+    public boolean isValid(Integer value, ConstraintValidatorContext context) {
+        return value == null || value > 0;
     }
 }

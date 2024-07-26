@@ -1,48 +1,42 @@
 package ru.yandex.practicum.filmorate.model;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import ru.yandex.practicum.filmorate.annotation.Login;
 
 @Data
 @Valid
 @AllArgsConstructor
-public class User implements IdModel<Long> {
-    private Long id;
+@NoArgsConstructor
+@Builder(toBuilder = true)
+public class User {
+    private int id;
+    private String name;
+    @Login
+    private String login;
     @Email
     @NotBlank
     private String email;
-    @Login
-    private String login;
-    private String name;
     @PastOrPresent
-    private LocalDate birthday;
-    private Set<Long> friends;
+    private LocalDate birthdate;
 
-    public User(String email, String login, String name, LocalDate birthday) {
+    public User(String name, String login, String email, LocalDate birthday) {
         this.email = email;
         this.login = login;
         this.name = name;
-        this.birthday = birthday;
+        this.birthdate = birthday;
     }
 
     public String getName() {
         return name.isBlank() ? login : name;
-    }
-
-    public void addFriend(Long friend) {
-        friends.add(friend);
-    }
-
-    public void removeFriend(Long friend) {
-        friends.remove(friend);
     }
 }

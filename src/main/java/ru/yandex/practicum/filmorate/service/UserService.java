@@ -1,9 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +13,10 @@ import ru.yandex.practicum.filmorate.storage.Storage;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class UserService {
-    private final Storage<User, Long> storage;
-
-    public UserService(Storage<User, Long> repository) {
-        log.info("Init User service.");
-        this.storage = repository;
-    }
+    private final Storage<User, Integer> storage;
+    private final FriendshipService friendshipService;
 
     public User add(User user) {
         storage.add(user);
@@ -26,17 +24,14 @@ public class UserService {
         return user;
     }
 
-    public User addFriend(Long one, Long two) {
-        User first = getUserOrThrow(one);
-        User second = getUserOrThrow(two);
+    public void addFriend(Integer from, Integer to) {
+        getOrThrow(from);
+        getOrThrow(to);
 
-        first.addFriend(two);
-        second.addFriend(one);
-
-        return first;
+        friendshipService.requestShip(from, to);
     }
 
-    private User getUserOrThrow(Long id) {
+    public User getOrThrow(Integer id) {
         User user = storage.get(id);
         if (user == null) {
             throw new NullPointerException("User with id " + id + " not found.");
@@ -44,29 +39,18 @@ public class UserService {
         return user;
     }
 
-    public User removeFriend(Long one, Long two) {
-        User first = getUserOrThrow(one);
-        User second = getUserOrThrow(two);
-
-        first.removeFriend(two);
-        second.removeFriend(one);
-
-        return first;
+    public void removeFriend(Integer id) {
+        friendshipService.delete(id);
     }
 
-    public Collection<User> getAllCommonFriends(Long one, Long two) {
-        User first = getUserOrThrow(one);
-        User second = getUserOrThrow(two);
+    public Collection<User> getAllCommonFriends(Integer from, Integer to) {
+        getOrThrow(from);
+        getOrThrow(to);
 
-        Set<Long> secondFriends = second.getFriends();
-
-        return first.getFriends().stream()
-                .filter(secondFriends::contains)
-                .map(storage::get)
-                .toList();
+        return friendshipService.getCommonFriends(from, to).stream().map(this::getById).collect(Collectors.toList());
     }
 
-    public User update(Long id, User user) {
+    public User update(Integer id, User user) {
         log.info("Update user with key: [" + id + "] with value [" + user + "]. Id not included.");
         return storage.update(user, id);
     }
@@ -76,14 +60,21 @@ public class UserService {
         return storage.getAll();
     }
 
-    public User getById(Long id) {
+    public User getById(Integer id) {
         return storage.get(id);
     }
 
-    public Collection<User> getFriends(Long id) {
-        return getUserOrThrow(id).getFriends().stream()
-                .map(this::getUserOrThrow)
+    public Collection<User> getFriends(Integer id) {
+        return friendshipService.getAll(id)
+                .map(friendship -> Objects.equals(friendship.getUserFromId(), id)
+                        ? friendship.getUserToId()
+                        : friendship.getUserFromId())
+                .map(this::getById)
                 .collect(Collectors.toList());
+    }
+
+    public void removeFriend(Integer id, Integer friendId) {
+        friendshipService.delete(friendshipService.findByIds(id, friendId).getId());
     }
 }
 

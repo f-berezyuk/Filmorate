@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.test.model;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ public class ModelsValidationTest {
 
     @Test
     public void validInputShouldCreateUser() {
-        User user = new User("email@mail.com", "login", "name", LocalDate.parse("2000-01-01"));
+        User user = new User("name", "login", "email@mail.com", LocalDate.parse("2000-01-01"));
 
         Set<ConstraintViolation<User>> violation = validator.validate(user);
         Assertions.assertTrue(violation.isEmpty());
@@ -36,7 +35,7 @@ public class ModelsValidationTest {
 
     @Test
     public void invalidInputShouldUserHasViolations() {
-        User user = new User("notAnEmail.com", "", "name", LocalDate.parse("3001-01-01"));
+        User user = new User("name", "", "notAnEmail.com", LocalDate.parse("3001-01-01"));
 
         Set<ConstraintViolation<User>> violation = validator.validate(user);
         System.out.println(violation.stream()
@@ -50,7 +49,7 @@ public class ModelsValidationTest {
         Film film = new Film("FILM",
                 "Desc",
                 LocalDate.parse("1895-12-28"),
-                Duration.ofMinutes(127));
+                127);
 
         Set<ConstraintViolation<Film>> violation = validator.validate(film);
         Assertions.assertTrue(violation.isEmpty(), String.join("\n", violation.toString()));
@@ -62,7 +61,7 @@ public class ModelsValidationTest {
         Film film = new Film("  ",
                 reallyBigDescription,
                 LocalDate.parse("1895-12-27"),
-                Duration.ofMinutes(-1));
+                -1);
 
         Set<ConstraintViolation<Film>> violation = validator.validate(film);
         System.out.println(violation.stream()
