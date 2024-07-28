@@ -15,12 +15,14 @@ import lombok.NoArgsConstructor;
 
 import ru.yandex.practicum.filmorate.annotation.DateThreshold;
 import ru.yandex.practicum.filmorate.annotation.PositiveDuration;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class FilmDto {
+public class FilmDtoV2 {
     private Long id;
     @NotBlank(message = "Name may not be null or empty")
     private String name;
@@ -31,27 +33,9 @@ public class FilmDto {
     @JsonAlias("releaseDate")
     private LocalDate releaseDate;
     @PositiveDuration
-    @JsonAlias("duration")
     private Integer duration;
 
-    private MpaDto mpa = null;
+    private Mpa mpa = null;
 
-    private Collection<GenreDto> genres = Collections.emptyList();
-
-    public FilmDto(String name, String description, LocalDate releaseDate, Integer duration) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-    }
-
-    public FilmDto(String name, String description, LocalDate releaseDate, Integer duration, MpaDto mpa,
-                   Collection<GenreDto> genres) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.mpa = mpa;
-        this.genres = genres;
-    }
+    private Collection<Genre> genres = Collections.emptyList();
 }

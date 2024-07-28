@@ -25,20 +25,20 @@ public class MpaDbStorage extends BaseDbStorage<Mpa, Long> {
     @Override
     public Mpa update(Mpa mpa, Long key) throws RepositoryNotFoundException, IllegalArgumentException {
         String sql = "UPDATE mpa SET mpa = ? WHERE id = ?";
-        update(sql, mpa.getMpa());
+        update(sql, mpa.getName());
         return get(key);
     }
 
     @Override
     public Collection<Mpa> getAll() {
-        String sql = "SELECT * FROM mpa";
+        String sql = "SELECT * FROM mpa ORDER BY ID";
         return findMany(sql);
     }
 
     @Override
     public Mpa add(Mpa mpa) throws IllegalArgumentException {
         String sql = "INSERT INTO mpa (mpa) VALUES (?)";
-        Long id = insert(sql, mpa.getMpa());
+        Long id = insert(sql, mpa.getName());
         return get(id);
     }
 

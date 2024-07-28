@@ -25,20 +25,20 @@ public class GenreDbStorage extends BaseDbStorage<Genre, Long> {
     @Override
     public Genre update(Genre genre, Long key) throws RepositoryNotFoundException {
         String sql = "UPDATE genres SET genre=? WHERE id=?";
-        update(sql, genre.getGenre(), key);
+        update(sql, genre.getName(), key);
         return get(key);
     }
 
     @Override
     public Collection<Genre> getAll() {
-        String sql = "SELECT * FROM genres";
+        String sql = "SELECT * FROM genres ORDER BY ID";
         return findMany(sql);
     }
 
     @Override
     public Genre add(Genre genre) throws IllegalArgumentException {
         String sql = "INSERT INTO genres (genre) VALUES (?)";
-        Long id = insert(sql, genre.getGenre());
+        Long id = insert(sql, genre.getName());
         return get(id);
     }
 

@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.MpaFilm;
 import ru.yandex.practicum.filmorate.model.dto.FilmDto;
+import ru.yandex.practicum.filmorate.model.dto.FilmDtoV2;
 import ru.yandex.practicum.filmorate.model.dto.GenreDto;
 import ru.yandex.practicum.filmorate.model.dto.MpaDto;
 
@@ -43,5 +44,19 @@ public class DtoMapper {
                 .filmId(filmDto.getId())
                 .mpaId(filmDto.getMpa().getId())
                 .build();
+    }
+
+    public static FilmDtoV2 toDtoV2(Film film, Mpa mpa, Collection<Genre> genres) {
+        FilmDtoV2.FilmDtoV2Builder builder = FilmDtoV2.builder()
+                .id(film.getId())
+                .name(film.getName())
+                .description(film.getDescription())
+                .releaseDate(film.getReleasedDate())
+                .duration(film.getDuration())
+                .genres(genres);
+        if (mpa != null) {
+            builder.mpa(mpa);
+        }
+        return builder.build();
     }
 }

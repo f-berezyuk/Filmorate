@@ -35,7 +35,7 @@ public class MpaFilmsDbStorage extends BaseDbStorage<MpaFilm, Long> {
     @Override
     public MpaFilm update(MpaFilm mpa, Long key) throws RepositoryNotFoundException, IllegalArgumentException {
         String sql = "UPDATE mpa_films SET mpa = ? WHERE id = ?";
-        update(sql, mpa.getMpaId());
+        update(sql, mpa.getMpaId(), key);
         return get(key);
     }
 

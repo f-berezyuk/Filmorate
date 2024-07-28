@@ -49,4 +49,9 @@ public class LikeDbStorage extends BaseDbStorage<Like, Long> {
         delete(sql, key);
         return like;
     }
+
+    public Collection<Long> getTop(Integer count) {
+        String sql = "SELECT f.id FROM FILMS f INNER JOIN LIKES L on f.ID = L.FILM_ID GROUP BY f.id ORDER BY COUNT(*) DESC LIMIT ?";
+        return jdbc.queryForList(sql, Long.class, count);
+    }
 }

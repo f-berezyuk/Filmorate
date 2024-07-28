@@ -35,7 +35,8 @@ public abstract class BaseInMemoryStorage<T, K> implements Storage<T, K> {
 
     public T add(T value) throws IllegalArgumentException {
         K key = idGenerator.generate();
-        return storage.put(key, value);
+        storage.put(key, value);
+        return storage.get(key);
     }
 
     public T delete(K key) {

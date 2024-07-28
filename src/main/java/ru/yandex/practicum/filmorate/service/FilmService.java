@@ -21,6 +21,7 @@ import ru.yandex.practicum.filmorate.model.GenreFilm;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.MpaFilm;
 import ru.yandex.practicum.filmorate.model.dto.FilmDto;
+import ru.yandex.practicum.filmorate.model.dto.FilmDtoV2;
 import ru.yandex.practicum.filmorate.model.dto.GenreDto;
 import ru.yandex.practicum.filmorate.storage.Storage;
 import ru.yandex.practicum.filmorate.storage.db.GenreDbStorage;
@@ -56,7 +57,7 @@ public class FilmService {
         MpaFilm addedMpa = mpaFilmsStorage.add(MpaFilm.builder().filmId(addedFilm.getId())
                 .mpaId(film.getMpa().getId()).build());
         Collection<GenreFilm> addedGenres =
-                film.getGenres().stream().map(genre -> genreFilmStorage.add(GenreFilm.builder()
+                film.getGenres().stream().distinct().map(genre -> genreFilmStorage.add(GenreFilm.builder()
                                 .genreId(genre.getId())
                                 .filmId(addedFilm.getId())
                                 .build()))
@@ -120,22 +121,22 @@ public class FilmService {
                 .forEach(oldKey -> genreFilmStorage.delete(genreToGenreFilms.get(oldKey)));
     }
 
-    public Collection<FilmDto> getAll() {
+    public Collection<FilmDtoV2> getAll() {
         log.info("Get all films");
         Collection<Film> allFilms = filmStorage.getAll();
         return allFilms.stream().map(film -> getById(film.getId())).collect(Collectors.toList());
     }
 
-    public FilmDto getById(Long id) {
+    public FilmDtoV2 getById(Long id) {
         Film film = getOrThrow(id);
         Collection<Genre> genres = genreStorage.getByFilmId(id);
         Mpa mpa = mpaStorage.getByFilmId(id);
-        return DtoMapper.toDto(film, mpa, genres);
+        return DtoMapper.toDtoV2(film, mpa, genres);
     }
 
-    public Collection<FilmDto> getFilms(int size, int from, String sort) {
+    public Collection<FilmDtoV2> getFilms(int size, int from, String sort) {
         Comparator<LocalDate> comparator = (o1, o2) -> sort.equals("asc") ? o1.compareTo(o2) : o2.compareTo(o1);
-        return getAll().stream().sorted(Comparator.comparing(FilmDto::getReleaseDate, comparator)).skip(from).limit(size).toList();
+        return getAll().stream().sorted(Comparator.comparing(FilmDtoV2::getReleaseDate, comparator)).skip(from).limit(size).toList();
 
     }
 
@@ -155,7 +156,7 @@ public class FilmService {
         return film;
     }
 
-    public Collection<FilmDto> getTop(Integer count) {
+    public Collection<FilmDtoV2> getTop(Integer count) {
         return likeService.getTop(count).stream().map(this::getById).toList();
     }
 
