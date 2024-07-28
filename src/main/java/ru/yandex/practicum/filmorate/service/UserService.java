@@ -1,57 +1,69 @@
 package ru.yandex.practicum.filmorate.service;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import ru.yandex.practicum.filmorate.exception.NoContentException;
+import ru.yandex.practicum.filmorate.exception.RepositoryNotFoundException;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Storage;
 
 @Slf4j
 @Service
-@AllArgsConstructor
 public class UserService {
-    private final Storage<User, Integer> storage;
+    private final Storage<User, Long> storage;
     private final FriendshipService friendshipService;
 
-    public User add(User user) {
-        storage.add(user);
-        log.info("Add user [" + user.getName() + "] with key [" + user.getId() + "]");
-        return user;
+    public UserService(@Qualifier("UserDbStorage") Storage<User, Long> storage,
+                       FriendshipService friendshipService) {
+        this.storage = storage;
+        this.friendshipService = friendshipService;
     }
 
-    public void addFriend(Integer from, Integer to) {
+    public User add(User user) {
+        User added = storage.add(user);
+        log.info("Add user [" + added.getName() + "] with key [" + added.getId() + "]");
+        return added;
+    }
+
+    public void addFriend(Long from, Long to) {
         getOrThrow(from);
         getOrThrow(to);
 
         friendshipService.requestShip(from, to);
     }
 
-    public User getOrThrow(Integer id) {
+    public User getOrThrow(Long id) {
         User user = storage.get(id);
         if (user == null) {
-            throw new NullPointerException("User with id " + id + " not found.");
+            throw new RepositoryNotFoundException("User with id " + id + " not found.");
         }
         return user;
     }
 
-    public void removeFriend(Integer id) {
+    public void removeFriend(Long id) {
         friendshipService.delete(id);
     }
 
-    public Collection<User> getAllCommonFriends(Integer from, Integer to) {
-        getOrThrow(from);
-        getOrThrow(to);
+    public Collection<User> getAllCommonFriends(Long from, Long to) {
+        Set<User> first = new HashSet<>(getFriends(from));
+        Set<User> second = new HashSet<>(getFriends(to));
 
-        return friendshipService.getCommonFriends(from, to).stream().map(this::getById).collect(Collectors.toList());
+        return first.stream().filter(second::contains).collect(Collectors.toSet());
     }
 
-    public User update(Integer id, User user) {
-        log.info("Update user with key: [" + id + "] with value [" + user + "]. Id not included.");
+    public User update(User user) {
+        Long id = user.getId();
+        log.info("Update user with key: [" + id + "] with value [" + user + "].");
         return storage.update(user, id);
     }
 
@@ -60,21 +72,31 @@ public class UserService {
         return storage.getAll();
     }
 
-    public User getById(Integer id) {
+    public User getById(Long id) {
         return storage.get(id);
     }
 
-    public Collection<User> getFriends(Integer id) {
-        return friendshipService.getAll(id)
-                .map(friendship -> Objects.equals(friendship.getUserFromId(), id)
-                        ? friendship.getUserToId()
-                        : friendship.getUserFromId())
+    public Collection<User> getFriends(Long id) {
+        getOrThrow(id);
+        return friendshipService.getAllFriends(id).stream()
+                .flatMap(f -> Stream.of(f.getUserTo(), f.getUserFrom()))
+                .filter(i -> !Objects.equals(id, i))
                 .map(this::getById)
                 .collect(Collectors.toList());
     }
 
-    public void removeFriend(Integer id, Integer friendId) {
-        friendshipService.delete(friendshipService.findByIds(id, friendId).getId());
+    public void removeFriend(Long id, Long friendId) throws NoContentException {
+        getOrThrow(id);
+        getOrThrow(friendId);
+        Friendship friendship = friendshipService.findByIds(id, friendId);
+        if (friendship == null) {
+            throw new NoContentException("Дружба не найдена");
+        }
+        friendshipService.delete(friendship.getId());
+    }
+
+    public User delete(Long id) {
+        return storage.delete(id);
     }
 }
 

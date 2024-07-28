@@ -13,9 +13,9 @@ public class FriendshipRowMapper implements RowMapper<Friendship> {
     @Override
     public Friendship mapRow(ResultSet rs, int rowNum) throws SQLException {
         return Friendship.builder()
-                .id(rs.getInt("id"))
-                .userFromId(rs.getInt("userFromId"))
-                .userToId(rs.getInt("userToId"))
+                .id(rs.getLong("id"))
+                .userFrom(rs.getLong("user_from"))
+                .userTo(rs.getLong("user_to"))
                 .status(rs.getBoolean("status"))
                 .build();
     }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -15,6 +16,7 @@ import ru.yandex.practicum.filmorate.exception.RepositoryNotFoundException;
 import ru.yandex.practicum.filmorate.storage.Storage;
 
 @RequiredArgsConstructor
+@Slf4j
 public abstract class BaseDbStorage<T, K> implements Storage<T, K> {
     protected final JdbcTemplate jdbc;
     protected final RowMapper<T> mapper;
@@ -25,6 +27,9 @@ public abstract class BaseDbStorage<T, K> implements Storage<T, K> {
             return Optional.ofNullable(result);
         } catch (EmptyResultDataAccessException ignored) {
             return Optional.empty();
+        } catch (Throwable e) {
+            log.error("Fail to get user.", e);
+            throw e;
         }
     }
 
@@ -32,7 +37,7 @@ public abstract class BaseDbStorage<T, K> implements Storage<T, K> {
         return jdbc.query(query, mapper, params);
     }
 
-    protected boolean delete(String query, Integer id) {
+    protected boolean delete(String query, Long id) {
         int rowsDeleted = jdbc.update(query, id);
         return rowsDeleted > 0;
     }
@@ -44,24 +49,28 @@ public abstract class BaseDbStorage<T, K> implements Storage<T, K> {
         }
     }
 
-    protected Integer insert(String query, Object... params) throws IllegalArgumentException {
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbc.update(connection -> {
-            PreparedStatement ps = connection
-                    .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            for (int idx = 0; idx < params.length; idx++) {
-                ps.setObject(idx + 1, params[idx]);
+    protected Long insert(String query, Object... params) throws IllegalArgumentException {
+        try {
+            GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+            jdbc.update(connection -> {
+                PreparedStatement ps = connection
+                        .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                for (int idx = 0; idx < params.length; idx++) {
+                    ps.setObject(idx + 1, params[idx]);
+                }
+                return ps;
+            }, keyHolder);
+
+            Integer keyAs = keyHolder.getKeyAs(Integer.class);
+
+            if (keyAs != null) {
+                return Long.valueOf(keyAs);
+            } else {
+                throw new IllegalArgumentException("Не удалось сохранить данные");
             }
-            return ps;
-        }, keyHolder);
-
-        Integer id = keyHolder.getKeyAs(Integer.class);
-
-        // Возвращаем id нового пользователя
-        if (id != null) {
-            return id;
-        } else {
-            throw new IllegalArgumentException("Не удалось сохранить данные");
+        } catch (Throwable e) {
+            log.error("Error on insert.", e);
+            throw new IllegalArgumentException("Не удалось сохранить данные", e);
         }
     }
 }

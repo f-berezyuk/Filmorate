@@ -10,20 +10,20 @@ import ru.yandex.practicum.filmorate.model.Like;
 import ru.yandex.practicum.filmorate.storage.db.mapper.LikeRowMapper;
 
 @Component
-public class LikeDbStorage extends BaseDbStorage<Like, Integer> {
+public class LikeDbStorage extends BaseDbStorage<Like, Long> {
 
     public LikeDbStorage(JdbcTemplate jdbc, LikeRowMapper likeMapper) {
         super(jdbc, likeMapper);
     }
 
     @Override
-    public Like get(Integer key) {
+    public Like get(Long key) {
         String sql = "SELECT * FROM likes WHERE id = ?";
         return findOne(sql, key).orElseThrow(() -> new RepositoryNotFoundException("Лайк не найден"));
     }
 
     @Override
-    public Like update(Like like, Integer key) throws RepositoryNotFoundException {
+    public Like update(Like like, Long key) throws RepositoryNotFoundException {
         String sql = "UPDATE likes SET user_id=?, film_id=? WHERE id=?";
         update(sql, like.getUserId(), like.getFilmId(), key);
         return get(key);
@@ -38,12 +38,12 @@ public class LikeDbStorage extends BaseDbStorage<Like, Integer> {
     @Override
     public Like add(Like like) throws IllegalArgumentException {
         String sql = "INSERT INTO likes (user_id, film_id) VALUES (?, ?)";
-        Integer id = insert(sql, like.getUserId(), like.getFilmId());
+        Long id = insert(sql, like.getUserId(), like.getFilmId());
         return get(id);
     }
 
     @Override
-    public Like delete(Integer key) {
+    public Like delete(Long key) {
         Like like = get(key);
         String sql = "DELETE FROM likes WHERE id = ?";
         delete(sql, key);

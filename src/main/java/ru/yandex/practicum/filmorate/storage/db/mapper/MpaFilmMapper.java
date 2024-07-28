@@ -13,9 +13,9 @@ public class MpaFilmMapper implements RowMapper<MpaFilm> {
     @Override
     public MpaFilm mapRow(ResultSet rs, int rowNum) throws SQLException {
         return MpaFilm.builder()
-                .id(rs.getInt("id"))
-                .mpaId(rs.getInt("mpaId"))
-                .filmId(rs.getInt("filmId"))
+                .id(rs.getLong("id"))
+                .mpaId(rs.getLong("mpa_id"))
+                .filmId(rs.getLong("film_id"))
                 .build();
     }
 }

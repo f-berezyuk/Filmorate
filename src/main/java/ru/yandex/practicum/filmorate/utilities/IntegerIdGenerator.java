@@ -3,14 +3,14 @@ package ru.yandex.practicum.filmorate.utilities;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IntegerIdGenerator implements KeyGenerator<Integer> {
-    private Integer lastId;
+public class IntegerIdGenerator implements KeyGenerator<Long> {
+    private Long lastId;
 
     public IntegerIdGenerator() {
-        lastId = 0;
+        lastId = 0L;
     }
 
-    public Integer generate() {
+    public Long generate() {
         lastId = lastId + 1;
         return lastId;
     }

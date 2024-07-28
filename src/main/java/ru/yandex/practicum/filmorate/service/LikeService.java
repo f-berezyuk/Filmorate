@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -18,18 +19,18 @@ import ru.yandex.practicum.filmorate.storage.Storage;
 @Service
 @AllArgsConstructor
 public class LikeService {
-    private final Storage<Like, Integer> storage;
+    private final Storage<Like, Long> storage;
 
-    public Like add(Integer userId, Integer filmId) {
+    public Like add(Long userId, Long filmId) {
         Like like = Like.builder().filmId(filmId).userId(userId).build();
         return storage.add(like);
     }
 
-    public Collection<Integer> getTop(Integer count) {
-        Hashtable<Integer, Long> filmToLikes = new Hashtable<>();
+    public Collection<Long> getTop(Integer count) {
+        Hashtable<Long, Long> filmToLikes = new Hashtable<>();
         List<Like> all = storage.getAll().stream().toList();
         all.forEach(like -> {
-            int id = like.getFilmId();
+            long id = like.getFilmId();
             long value = filmToLikes.contains(id)
                     ? filmToLikes.get(id)
                     : 0;
@@ -41,28 +42,28 @@ public class LikeService {
                 .collect(Collectors.toList());
     }
 
-    public void delete(Integer id) {
+    public void delete(Long id) {
         storage.delete(id);
     }
 
-    public Like get(Integer id) {
+    public Like get(Long id) {
         return storage.get(id);
     }
 
-    public Long getCount(Integer filmId) {
-        return storage.getAll().stream().filter(l -> filmId == l.getFilmId()).count();
+    public Long getCount(Long filmId) {
+        return storage.getAll().stream().filter(l -> Objects.equals(filmId, l.getFilmId())).count();
     }
 
-    public Long delete(Integer userId, Integer filmId) {
+    public Long delete(Long userId, Long filmId) {
         var like = findByUserFilmId(userId, filmId);
         storage.delete(like.getId());
         return getCount(filmId);
     }
 
-    private Like findByUserFilmId(Integer userId, Integer filmId) {
+    private Like findByUserFilmId(Long userId, Long filmId) {
         return storage.getAll().stream()
-                .filter(f -> f.getFilmId() == filmId)
-                .filter(f -> f.getUserId() == userId)
+                .filter(f -> Objects.equals(f.getFilmId(), filmId))
+                .filter(f -> Objects.equals(f.getUserId(), userId))
                 .findFirst()
                 .orElseThrow(() -> new RepositoryNotFoundException("Didn't find like"));
     }

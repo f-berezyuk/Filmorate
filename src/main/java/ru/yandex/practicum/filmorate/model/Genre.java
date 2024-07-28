@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder(toBuilder = true)
 public class Genre {
-    private int id;
+    private Long id;
     private String genre;
 }
 

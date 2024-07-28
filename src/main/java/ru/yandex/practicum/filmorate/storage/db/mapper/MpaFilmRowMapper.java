@@ -6,16 +6,16 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import ru.yandex.practicum.filmorate.model.Like;
+import ru.yandex.practicum.filmorate.model.MpaFilm;
 
 @Component
-public class LikeRowMapper implements RowMapper<Like> {
+public class MpaFilmRowMapper implements RowMapper<MpaFilm> {
     @Override
-    public Like mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return Like.builder()
+    public MpaFilm mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return MpaFilm.builder()
                 .id(rs.getLong("id"))
-                .userId(rs.getLong("user_id"))
-                .filmId(rs.getLong("film_id"))
+                .mpaId(rs.getLong("mpa"))
+                .filmId(rs.getLong("film"))
                 .build();
     }
 }

@@ -10,22 +10,22 @@ import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.storage.db.mapper.FriendshipRowMapper;
 
 @Component
-public class FriendshipDbStorage extends BaseDbStorage<Friendship, Integer> {
+public class FriendshipDbStorage extends BaseDbStorage<Friendship, Long> {
 
     public FriendshipDbStorage(JdbcTemplate jdbc, FriendshipRowMapper friendshipMapper) {
         super(jdbc, friendshipMapper);
     }
 
     @Override
-    public Friendship get(Integer key) {
-        String sql = "SELECT * FROM friendships WHERE id = ?";
+    public Friendship get(Long key) {
+        String sql = "SELECT * FROM FRIENDSHIPS WHERE ID = ?";
         return findOne(sql, key).orElseThrow(() -> new RepositoryNotFoundException("Дружба не найдена"));
     }
 
     @Override
-    public Friendship update(Friendship friendship, Integer key) throws RepositoryNotFoundException {
+    public Friendship update(Friendship friendship, Long key) throws RepositoryNotFoundException {
         String sql = "UPDATE friendships SET user_from_id=?, user_to_id=?, status=? WHERE id=?";
-        update(sql, friendship.getUserFromId(), friendship.getUserToId(), friendship.isStatus(), key);
+        update(sql, friendship.getUserFrom(), friendship.getUserTo(), friendship.isStatus(), key);
         return get(key);
     }
 
@@ -37,13 +37,13 @@ public class FriendshipDbStorage extends BaseDbStorage<Friendship, Integer> {
 
     @Override
     public Friendship add(Friendship friendship) throws IllegalArgumentException {
-        String sql = "INSERT INTO friendships (user_from_id, user_to_id, status) VALUES (?, ?, ?)";
-        Integer id = insert(sql, friendship.getUserFromId(), friendship.getUserToId(), friendship.isStatus());
+        String sql = "INSERT INTO friendships (USER_FROM, USER_TO, STATUS) VALUES (?, ?, ?)";
+        Long id = insert(sql, friendship.getUserFrom(), friendship.getUserTo(), friendship.isStatus());
         return get(id);
     }
 
     @Override
-    public Friendship delete(Integer key) {
+    public Friendship delete(Long key) {
         Friendship friendship = get(key);
         String sql = "DELETE FROM friendships WHERE id = ?";
         delete(sql, key);

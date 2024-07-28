@@ -14,11 +14,11 @@ public class UserRowMapper implements RowMapper<User> {
     @Override
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
         return User.builder()
-                .id(rs.getInt("id"))
+                .id(rs.getLong("id"))
                 .name(rs.getString("name"))
                 .login(rs.getString("login"))
                 .email(rs.getString("email"))
-                .birthdate(rs.getObject("birthdate", LocalDate.class))
+                .birthday(rs.getObject("birthday", LocalDate.class))
                 .build();
     }
 }

@@ -13,9 +13,9 @@ public class GenreFilmRowMapper implements RowMapper<GenreFilm> {
     @Override
     public GenreFilm mapRow(ResultSet rs, int rowNum) throws SQLException {
         return GenreFilm.builder()
-                .id(rs.getInt("id"))
-                .genreId(rs.getInt("genre_id"))
-                .filmId(rs.getInt("film_id"))
+                .id(rs.getLong("id"))
+                .genreId(rs.getLong("genre"))
+                .filmId(rs.getLong("film"))
                 .build();
     }
 }

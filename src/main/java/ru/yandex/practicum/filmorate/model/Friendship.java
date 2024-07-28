@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @Builder(toBuilder = true)
 public class Friendship {
-    private Integer id;
-    private Integer userFromId;
-    private Integer userToId;
+    private Long id;
+    private Long userFrom;
+    private Long userTo;
     private boolean status;
 }

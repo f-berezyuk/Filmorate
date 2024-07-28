@@ -6,12 +6,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.dto.FilmDto;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.FriendshipService;
 import ru.yandex.practicum.filmorate.service.LikeService;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.db.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.GenreFilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.MpaFilmsDbStorage;
 import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.utilities.IntegerIdGenerator;
@@ -21,6 +25,14 @@ public class ServiceTest {
     private FriendshipService friendshipService;
     @MockBean
     private LikeService likeService;
+    @MockBean
+    private MpaFilmsDbStorage mpaFilmsStorage;
+    @MockBean
+    private MpaDbStorage mpaStorage;
+    @MockBean
+    private GenreFilmDbStorage genreFilmStorage;
+    @MockBean
+    private GenreDbStorage genreStorage;
 
     @Test
     public void shouldAddUser() {
@@ -34,10 +46,11 @@ public class ServiceTest {
 
     @Test
     public void shouldAddFilm() {
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(new IntegerIdGenerator()), likeService);
-        Film film = new Film("name", "description", LocalDate.now().minusYears(3),
+        FilmService filmService = new FilmService(new InMemoryFilmStorage(new IntegerIdGenerator()), mpaFilmsStorage,
+                mpaStorage, genreFilmStorage, genreStorage, likeService);
+        FilmDto film = new FilmDto("name", "description", LocalDate.now().minusYears(3),
                 120);
-        Film newFilm = filmService.add(film);
+        FilmDto newFilm = filmService.add(film);
 
         Assertions.assertEquals(film, newFilm);
         Assertions.assertEquals(film, filmService.getById(film.getId()));
@@ -46,15 +59,14 @@ public class ServiceTest {
     @Test
     public void shouldWorkWithLikes() {
         FilmService filmService = new FilmService(new InMemoryFilmStorage(new IntegerIdGenerator()),
-                likeService);
-        Film film = new Film("name", "description", LocalDate.now().minusYears(3), 120);
+                mpaFilmsStorage, mpaStorage, genreFilmStorage, genreStorage, likeService);
+        FilmDto film = new FilmDto("name", "description", LocalDate.now().minusYears(3), 120);
         filmService.add(film);
-        Assertions.assertEquals(1, filmService.like(film.getId(), 1));
-        Assertions.assertEquals(2, filmService.like(film.getId(), 2));
-        Assertions.assertEquals(3, filmService.like(film.getId(), 3));
-        Assertions.assertEquals(2, filmService.deleteLike(film.getId(), 3));
+        Assertions.assertEquals(1, filmService.like(film.getId(), 1L));
+        Assertions.assertEquals(2, filmService.like(film.getId(), 2L));
+        Assertions.assertEquals(3, filmService.like(film.getId(), 3L));
+        Assertions.assertEquals(2, filmService.deleteLike(film.getId(), 3L));
 
         Assertions.assertEquals(film, filmService.getTop(10).stream().findFirst().orElseThrow());
     }
-
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder(toBuilder = true)
 public class MpaFilm {
-    private int id;
-    private int mpaId;
-    private int filmId;
+    private Long id;
+    private Long mpaId;
+    private Long filmId;
 }

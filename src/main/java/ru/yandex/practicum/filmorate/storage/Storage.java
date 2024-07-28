@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.exception.RepositoryNotFoundException;
 public interface Storage<T, K> {
     T get(K key);
 
-    T update(T value, K key) throws RepositoryNotFoundException;
+    T update(T value, K key) throws RepositoryNotFoundException, IllegalArgumentException;
 
     Collection<T> getAll();
 

@@ -14,11 +14,11 @@ public class FilmRowMapper implements RowMapper<Film> {
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         return Film.builder()
-                .id(rs.getInt("id"))
+                .id(rs.getLong("id"))
                 .name(rs.getString("name"))
                 .description(rs.getString("description"))
-                .released(rs.getObject("released", LocalDate.class))
-                .durationMin(rs.getInt("duration_min"))
+                .releasedDate(rs.getObject("releaseDate", LocalDate.class))
+                .duration(rs.getInt("duration"))
                 .build();
     }
 }
