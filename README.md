@@ -11,7 +11,7 @@ Table films {
 id integer [primary key]
 name varchar
 description varchar
-released date
+releaseDate date
 duration_in_min integer
 mpa varchar
 }
@@ -28,7 +28,7 @@ id integer [primary key]
 name varchar
 login varchar
 email varchar
-birthdate date
+birthday date
 }
 ```
 ```

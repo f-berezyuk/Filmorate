@@ -2,10 +2,12 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import ru.yandex.practicum.filmorate.exception.NoContentException;
 import ru.yandex.practicum.filmorate.exception.RepositoryNotFoundException;
 
 @RestControllerAdvice("ru.yandex.practicum.filmorate.controller")
@@ -16,6 +18,13 @@ public class ErrorHandler {
     public ErrorResponse handle(final ValidationException e) {
         return new ErrorResponse("Validation error", e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handle(final MethodArgumentNotValidException e) {
+        return new ErrorResponse("Validation error", e.getMessage());
+    }
+
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -33,6 +42,12 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handle(final RepositoryNotFoundException e) {
         return new ErrorResponse("Value not found", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ErrorResponse handle(final NoContentException e) {
+        return new ErrorResponse("Пользователи не дружат", e.getMessage());
     }
 
     @ExceptionHandler

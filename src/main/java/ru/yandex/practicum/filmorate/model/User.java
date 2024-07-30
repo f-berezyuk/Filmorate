@@ -1,33 +1,41 @@
 package ru.yandex.practicum.filmorate.model;
 
 import java.time.LocalDate;
-import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import ru.yandex.practicum.filmorate.annotation.Login;
 
 @Data
 @Valid
+@ToString
+@NoArgsConstructor
 @AllArgsConstructor
-public class User implements IdModel<Long> {
+@Builder(toBuilder = true)
+@EqualsAndHashCode(of = {"id", "login", "email"})
+public class User {
     private Long id;
+    private String name;
+    @Login
+    private String login;
     @Email
     @NotBlank
     private String email;
-    @Login
-    private String login;
-    private String name;
-    @PastOrPresent
+    @PastOrPresent(message = "birthday should be past or present.")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
-    private Set<Long> friends;
 
-    public User(String email, String login, String name, LocalDate birthday) {
+    public User(String name, String login, String email, LocalDate birthday) {
         this.email = email;
         this.login = login;
         this.name = name;
@@ -36,13 +44,5 @@ public class User implements IdModel<Long> {
 
     public String getName() {
         return name.isBlank() ? login : name;
-    }
-
-    public void addFriend(Long friend) {
-        friends.add(friend);
-    }
-
-    public void removeFriend(Long friend) {
-        friends.remove(friend);
     }
 }
